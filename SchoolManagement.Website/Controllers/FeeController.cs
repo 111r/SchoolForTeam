@@ -295,7 +295,6 @@ namespace SchoolManagement.Website.Controllers
                 //&& (fd.Medium.Contains(studentdata.Medium) || string.IsNullOrEmpty(studentdata.Medium))  // Handle possible null or empty values for medium
                 //&& c.CurrentYear == b.Batch_Id
                 //                select fd).Distinct().ToList();
-
             }
 
 
@@ -1541,11 +1540,32 @@ namespace SchoolManagement.Website.Controllers
             }
 
             // अब last receipt fetch करो reference के लिए
-            var lastReceipt = _context.TblFeeReceipts
-                .Where(x => x.StudentId == model.StudentId && x.ClassName == className)
-                .OrderByDescending(x => x.AddedDate)
-                .FirstOrDefault();
+            var lastReceipts = _context.TblFeeReceipts
+    .Where(x => x.StudentId == model.StudentId
+                && x.ClassName == className
+                && x.OldBalance > 0)
+    .OrderByDescending(x => x.AddedDate)
+    .AsEnumerable() // switch to LINQ-to-Objects
+    .Where(x =>
+    {
+        decimal paid = decimal.TryParse(x.PaidAmount, out var p) ? p : 0;
+        decimal concession = decimal.TryParse(x.ConcessionAmt.ToString(), out var c) ? c : 0;
+        return (paid + concession) < Convert.ToDecimal(x.TotalFee);
+    })
+    .ToList();
 
+
+            // Agar aapko FeeIds merge (comma separated) karne hain
+            var mergedFeeIds = string.Join(",", lastReceipts
+                .Where(r => !string.IsNullOrEmpty(r.FeeHeadingIDs))
+                .Select(r => r.FeeHeadingIDs));
+
+
+            //var lastReceipt = _context.TblFeeReceipts
+            //    .Where(x => x.StudentId == model.StudentId && x.ClassName == className)
+            //    .OrderByDescending(x => x.AddedDate)
+            //    .FirstOrDefault();
+            var lastReceipt = _context.TblFeeReceipts.Where(x => x.StudentId == model.StudentId && x.ClassName == className && x.OldBalance > 0).OrderByDescending(x => x.AddedDate).FirstOrDefault();
             if (lastReceipt == null) return false;
 
             // नया receipt बनाओ
@@ -1569,16 +1589,16 @@ namespace SchoolManagement.Website.Controllers
                 InsertBy = lastReceipt.InsertBy,
                 FeeReceiptsOneTimeCreator = lastReceipt.FeeReceiptsOneTimeCreator,
                 IsDeleted = false,
-                FeeHeadingIDs = "0",//lastReceipt.FeeHeadingIDs,
+                FeeHeadingIDs = mergedFeeIds,
                 // important fields
                 OldBalance = dueAmount, // बचा हुआ balance (अगर कुछ बचा है)
                 ReceiptAmt = (originalDue), // add current payment
-                BalanceAmt = dueAmount, // बचा हुआ balance दिखाओ
-                TotalFee = lastReceipt.TotalFee,
+                PaidAmount = originalDue.ToString(), // बचा हुआ balance दिखाओ
+                TotalFee = originalDue,
                 LateFee = lastReceipt.LateFee,
                 Concession = lastReceipt.Concession,
                 ConcessionAmt = lastReceipt.ConcessionAmt,
-                FeePaids = lastReceipt.FeePaids,
+                FeePaids = originalDue.ToString(),
                 PayHeadings = lastReceipt.PayHeadings,
                 Jan = lastReceipt.Jan,
                 Feb = lastReceipt.Feb,

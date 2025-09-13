@@ -3801,6 +3801,12 @@ namespace SchoolManagement.Website.Controllers
                         LastStudiedSchoolName = studentViewModel.LaststudiedSchoolName,
 
                     };
+                    Tbl_Batches activeBatch = _context.Tbl_Batches.Where(x => x.IsActiveForAdmission == true).FirstOrDefault();
+                    if (activeBatch != null)
+                    {
+                        StudentsRegistration.Batch_Id = activeBatch.Batch_Id;
+                        StudentsRegistration.CurrentYear = activeBatch.Batch_Id;
+                    }
                     if (studentViewModel.ProfileAvatar != null)
                     {
                         if (studentViewModel.ProfileAvatar.ContentLength > 0)
@@ -4022,10 +4028,7 @@ namespace SchoolManagement.Website.Controllers
                     studentViewModel.StudentRegistration.IsApprove = Isapprove;
 
 
-                    Tbl_Batches activeBatch = _context.Tbl_Batches.Where(x => x.IsActiveForAdmission == true).FirstOrDefault();
-                    if (activeBatch != null)
-                        studentViewModel.StudentRegistration.Batch_Id = activeBatch.Batch_Id;
-
+                   
                     //profile image
                     if (uploadFilesViewModel.ProfileAvatar != null)
                     {
@@ -4049,7 +4052,12 @@ namespace SchoolManagement.Website.Controllers
                             studentViewModel.StudentRegistration.AdharFile = filename;
                         }
                     }
-
+                    Tbl_Batches activeBatch = _context.Tbl_Batches.Where(x => x.IsActiveForAdmission == true).FirstOrDefault();
+                    if (activeBatch != null)
+                    {
+                        studentViewModel.StudentRegistration.Batch_Id = activeBatch.Batch_Id;
+                        studentViewModel.StudentRegistration.CurrentYear = activeBatch.Batch_Id;
+                    }
                     _StudentsRegistration.Insert(studentViewModel.StudentRegistration);
                     _StudentsRegistration.Save();
 
@@ -4237,7 +4245,12 @@ namespace SchoolManagement.Website.Controllers
                     string year = Convert.ToDateTime(studentViewModel.StudentRegistration.Registration_Date).Year.ToString();
                     studentViewModel.StudentRegistration.AddedYear = year;
                     studentViewModel.StudentRegistration.IsApprove = Isapprove;
-
+                    Tbl_Batches activeBatch = _context.Tbl_Batches.Where(x => x.IsActiveForAdmission == true).FirstOrDefault();
+                    if (activeBatch != null)
+                    {
+                        studentViewModel.StudentRegistration.Batch_Id = activeBatch.Batch_Id;
+                        studentViewModel.StudentRegistration.CurrentYear = activeBatch.Batch_Id;
+                    }
 
 
                     //profile image
@@ -6126,6 +6139,7 @@ namespace SchoolManagement.Website.Controllers
                         studentViewModel.StudentRegistration.IsApprove = data.IsApprove;
                         studentViewModel.StudentRegistration.UserId = data.UserId;
                         studentViewModel.StudentRegistration.IsApplyforTC = data.IsApplyforTC;
+                        studentViewModel.StudentRegistration.CurrentYear = data.CurrentYear;
                         //studentViewModel.StudentRegistration.AddedYear = data.AddedYear;
                         //studentViewModel.StudentRegistration.Registration_Date = data.Registration_Date;
                         //studentViewModel.StudentRegistration.IsEmailsent = data.IsEmailsent;
@@ -6144,6 +6158,7 @@ namespace SchoolManagement.Website.Controllers
                         StudentReg.PerEduNumber = studentViewModel.StudentRegistration.PerEduNumber;
                         StudentReg.FamilySSSMID = studentViewModel.StudentRegistration.FamilySSSMID;
                         StudentReg.Registration_Date = studentViewModel.StudentRegistration.Registration_Date;
+
                         StudentReg.Religion_Id = studentViewModel.StudentRegistration.Religion != null ? Int32.Parse(studentViewModel.StudentRegistration.Religion) : 176;
                         //StudentReg.PerEduNumber = studentViewModel.StudentRegistration.PerEduNumber;
                         StudentReg.ApaarId = studentViewModel.StudentRegistration.ApaarId;

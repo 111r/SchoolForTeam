@@ -141,7 +141,8 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody id="teacherTableBody">
-                                                    @{
+                                                    @if (ViewBag.TeacherDetails!=null)
+                                                    {
                                                         foreach (var item in ViewBag.TeacherDetails as IEnumerable<SchoolManagement.Data.Models.StafsDetails>)
                                                         {
                                                             <tr>
@@ -235,18 +236,24 @@
                                         <div class="form_group">
                                             <select  id="Class" name="ClassName">
                                                 <option value="0">---Select---</option>
-                                                @foreach (var item in ViewBag.Classes as IEnumerable<Tbl_DataListItem>)
+                                                @if (ViewBag.Classes != null)
+                                                {
+                                                foreach (var item in ViewBag.Classes as IEnumerable<Tbl_DataListItem>)
                                                 {
                                                     <option value="@item.DataListItemId">@item.DataListItemName</option>
+                                                }
                                                 }
                                             </select>
                                         </div>
                                         <div class="form_group">
                                             <select id="Section" name="SectionName">
                                                 <option value="0">---Select---</option>
-                                                @foreach (var item in ViewBag.Section as IEnumerable<Tbl_DataListItem>)
+                                                @if (ViewBag.Section != null)
                                                 {
-                                                    <option value="@item.DataListItemId">@item.DataListItemName</option>
+                                                    foreach (var item in ViewBag.Section as IEnumerable<Tbl_DataListItem>)
+                                                    {
+                                                        <option value="@item.DataListItemId">@item.DataListItemName</option>
+                                                    }
                                                 }
                                             </select>
                                         </div>
